@@ -9,6 +9,12 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
 - (placeholder — next iteration's changes land here)
 
+## [0.1.2] — 2026-09-17
+
+### Notes
+- No content changes; aegis README had no openOODA substrate references.
+  Bumped to keep cadence with the v0.1.2 doctrine-level cleanup.
+
 ## [0.1.1] — 2026-09-17
 
 ### Added
