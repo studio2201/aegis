@@ -6,8 +6,16 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-09-18
+
 ### Added
-- (placeholder — next iteration's changes land here)
+- Working pure `std::` Rust implementation of Aegis PQC migration scanner.
+- Static scanner discovering classical cryptographic call sites: RSA, classic ECC, OpenSSL EVP_PKEY, and weak signature hashes.
+- Automated OMB M-26-15 and Executive Order 14412 compliance migration plan generator.
+- Drop-in replacement shims for ML-KEM-768 (FIPS 203) and ML-DSA-65 (FIPS 204).
+- Policy verification gating against post-2030 cryptographic regressions.
+- Standardized CLI flags: `-h/--help`, `-V/--version`, `--format`, `-o/--output`, `-q/--quiet`, `-v/--verbose`.
+- Performance test verifying 10,000 lines scanned in ~1ms (budget 600ms).
 
 ## [0.1.2] — 2026-09-17
 

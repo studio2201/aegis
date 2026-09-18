@@ -1,10 +1,10 @@
-//! tools/perf/bench.rs — §18 bench harness for aegis.
-//!
-//! Lives as a `#[test]` in tests/integration.rs via `include!` so it is
-//! exercised by `cargo test --release perf_aegis_scan_within_budget`.
-//! Honors §18: std::time only, median-of-5, line-oriented output.
-//!
-//! Budget: aegis scan on 10k LoC source ≤ 600 ms median ±25%.
+// tools/perf/bench.rs — §18 bench harness for aegis.
+//
+// Lives as a `#[test]` in tests/integration.rs via `include!` so it is
+// exercised by `cargo test --release perf_aegis_scan_within_budget`.
+// Honors §18: std::time only, median-of-5, line-oriented output.
+//
+// Budget: aegis scan on 10k LoC source ≤ 600 ms median ±25%.
 
 use std::time::Instant;
 
@@ -42,5 +42,23 @@ fn perf_aegis_scan_within_budget() {
 }
 
 // Fixture builders — synthetic, committed (per §18-C5).
-fn synth_source_with_n_loc(_n: usize) -> aegis::Source { unimplemented!() }
-fn policy() -> aegis::Policy { unimplemented!() }
+fn synth_source_with_n_loc(n: usize) -> aegis::Source {
+    let mut content = String::with_capacity(n * 40);
+    for i in 0..n {
+        if i % 250 == 0 {
+            content.push_str("let key = RSASSA_PKCS1_v1_5::new();\n");
+        } else if i % 400 == 0 {
+            content.push_str("let curve = secp256k1::verify(&msg);\n");
+        } else {
+            content.push_str("let val = compute_safe_operation(i);\n");
+        }
+    }
+    aegis::Source {
+        path: "synthetic_source.rs".to_string(),
+        content,
+    }
+}
+
+fn policy() -> aegis::Policy {
+    aegis::Policy::default()
+}
