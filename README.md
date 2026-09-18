@@ -2,7 +2,7 @@
 
 **PQC migration SDK.** Scans for RSA/ECC usage. Plans the migration. Ships the replacement primitives.
 
-**Status:** pre-release scaffold (2026-09-17). No source code yet.
+**Status:** v0.2.0 release (2026-09-18).
 
 ## What it does
 
