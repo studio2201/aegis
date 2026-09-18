@@ -6,6 +6,16 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.5] — 2026-09-18
+
+### Added
+- Expanded documentation in README with authoritative problem descriptions and citations:
+  - White House OMB M-26-15 and NSM-10 post-quantum directives.
+  - NIST FIPS 203 (ML-KEM) and FIPS 204 (ML-DSA) standards.
+  - NSA CNSA 2.0 post-quantum algorithm transition advisory.
+- Added comprehensive "How It Works Under the Hood" architectural breakdown.
+- Upgraded release metadata and diagnostic baseline.
+
 ## [0.2.4] — 2026-09-18
 
 ### Added

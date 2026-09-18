@@ -1,7 +1,7 @@
 # Aegis
 
 [![CI](https://github.com/studio2201/aegis/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/studio2201/aegis/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/badge/version-v0.2.4-blue.svg)](https://github.com/studio2201/aegis/releases)
+[![Release](https://img.shields.io/badge/version-v0.2.5-blue.svg)](https://github.com/studio2201/aegis/releases)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Pure std::](https://img.shields.io/badge/pure-std%3A%3A-success.svg)](https://studio2201.com)
 [![Reproducible](https://img.shields.io/badge/reproducible-OK-brightgreen.svg)](tools/dev/repro.sh)
@@ -15,6 +15,22 @@
 
 **PQC migration SDK & scanner.** Scans classical RSA/ECC cryptography, plans in OMB M-26-15 format, and emits ML-KEM-768 / ML-DSA-65 replacements.
 
+## Why This Matters & Authoritative Mandates
+
+### 1. The Quantum Decryption Threat & "Harvest Now, Decrypt Later"
+Every standard asymmetric encryption and digital signature algorithm in common use today (RSA-2048/4096, ECDSA, ECDH) will be broken by Shor's algorithm once quantum computers reach scale. Adversaries are actively intercepting and storing encrypted traffic today to decrypt it retrospectively once hardware arrives.
+- **[White House OMB M-26-15](https://www.whitehouse.gov/wp-content/uploads/2022/11/M-23-02-M-Memo-on-Migrating-to-Post-Quantum-Cryptography.pdf)**: Federal directive mandating migration of vulnerable cryptography by December 31, 2030 across government and contractor software.
+- **[National Security Memorandum 10 (NSM-10)](https://www.whitehouse.gov/briefing-room/statements-releases/2022/05/04/national-security-memorandum-on-promoting-united-states-leadership-in-quantum-computing-while-mitigating-risks-to-vulnerable-cryptographic-systems/)**: Mandates executive branch transition to post-quantum cryptography.
+- **[NIST FIPS 203 (ML-KEM)](https://csrc.nist.gov/pubs/fips/203/final) & [FIPS 204 (ML-DSA)](https://csrc.nist.gov/pubs/fips/204/final)**: Official federal post-quantum cryptographic standards published in August 2024.
+- **[NSA CNSA 2.0 Cybersecurity Advisory](https://media.defense.gov/2022/Sep/07/2003071834/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS_.PDF)**: Sets mandatory post-quantum algorithm suite selection requirements.
+
+## How It Works Under the Hood
+
+1. **Static AST Call Site Scanner (`src/scan.rs`)**: Performs high-speed lexical analysis searching for RSA key generation, classic ECC curves (secp256k1, prime256v1), OpenSSL `EVP_PKEY` pointers, and vulnerable hashes.
+2. **OMB M-26-15 Compliance Planner (`src/plan.rs`)**: Generates 3-phase roadmaps mapping identified sites to statutory milestone dates: Phase 1 Inventory (2026), Phase 2 Hybrid KEM (2028), and Phase 3 Full PQC (2030).
+3. **Drop-in Quantum-Safe Shims (`src/migrate.rs`)**: Emits pure standard Rust and C shims replacing legacy primitives with ML-KEM-768 encapsulation and ML-DSA-65 signatures.
+4. **Zero Crates & Bit-Reproducibility**: Pure `std::` Rust with strict $\le 256$ LOC per file, verified bit-reproducible via `tools/dev/repro.sh`.
+
 ## Quick Start
 
 ```bash
@@ -23,6 +39,12 @@ curl -fsSL https://studio2201.com/install.sh | sh -s aegis
 
 # Scan source code for classical cryptography
 aegis scan .
+
+# Generate federal OMB M-26-15 migration plan
+aegis plan .
+
+# Emit drop-in PQC replacement shims
+aegis shim rust
 
 # Run system diagnostics
 aegis doctor
@@ -39,12 +61,6 @@ Scan pull requests for classical crypto patterns before merging:
     path: '.'
     format: 'text'
 ```
-
-## What it does
-
-- Scans source trees for RSA, ECC, and EVP_PKEY calls.
-- Emits OMB M-26-15 compliance roadmaps with risk levels and target completion dates.
-- Emits drop-in ML-KEM-768 key encapsulation and ML-DSA-65 digital signature shims.
 
 ## CLI Commands
 
@@ -67,11 +83,6 @@ Certify post-quantum cryptography readiness and federal OMB compliance:
 <!-- Federal OMB M-26-15 Compliance Badge -->
 [![OMB M-26-15](https://img.shields.io/badge/OMB%20M--26--15-COMPLIANT-brightgreen.svg)](https://studio2201.com/aegis)
 ```
-
-## Why
-
-- Dec 31, 2030 is the federal OMB deadline for post-quantum cryptography migration.
-- Pure Rust, `std::` only. Zero crates.io dependencies. Strictly <= 256 LOC per source file.
 
 ## License
 
