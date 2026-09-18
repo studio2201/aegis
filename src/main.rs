@@ -19,7 +19,13 @@ use std::process;
 
 fn write_output(content: &str, target: Option<&PathBuf>) -> Result<(), std::io::Error> {
     if let Some(path) = target {
-        fs::write(path, content)
+        fs::write(path, content)?;
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let _ = fs::set_permissions(path, fs::Permissions::from_mode(0o644));
+        }
+        Ok(())
     } else {
         print!("{}", content);
         Ok(())
@@ -159,7 +165,13 @@ fn run() -> Result<i32, CliError> {
             println!("aegis {}", VERSION);
             Ok(0)
         }
-        Subcommand::Doctor => Ok(doctor::run_doctor("aegis", VERSION, config.format)),
+        Subcommand::Doctor => {
+            let (code, output) = doctor::run_doctor("aegis", VERSION, config.format);
+            if !config.quiet || config.output_file.is_some() {
+                write_output(&output, config.output_file.as_ref())?;
+            }
+            Ok(code)
+        }
         Subcommand::Update => update::run_update("aegis", VERSION).map_err(CliError::Runtime),
         Subcommand::Shim => {
             let shims = format!(
