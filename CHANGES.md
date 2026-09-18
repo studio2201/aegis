@@ -6,6 +6,13 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.4] — 2026-09-18
+
+### Added
+- Tool-specific badges on README: PQC Readiness, Federal OMB M-26-15 Compliance, NIST FIPS 203/204 Standards, Algorithms (ML-KEM/ML-DSA), and Classical Crypto elimination.
+- README guide for embedding PQC readiness and OMB compliance badges in repositories.
+- Upgraded release metadata and diagnostic baseline.
+
 ## [0.2.0] — 2026-09-18
 
 ### Added
