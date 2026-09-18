@@ -1,0 +1,33 @@
+name: 'Aegis PQC Migration Scanner'
+description: 'Scans source code for classical crypto and plans PQC migration'
+author: 'studio2201'
+branding:
+  icon: 'lock'
+  color: 'purple'
+
+inputs:
+  path:
+    description: 'Source path to scan for classical crypto algorithms'
+    required: false
+    default: '.'
+  format:
+    description: 'Output format (text, json)'
+    required: false
+    default: 'text'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Rust
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Build aegis
+      shell: bash
+      run: |
+        cargo build --release --manifest-path "${{ github.action_path }}/Cargo.toml"
+        echo "${{ github.action_path }}/target/release" >> $GITHUB_PATH
+
+    - name: Run Aegis Scan
+      shell: bash
+      run: |
+        aegis scan "${{ inputs.path }}" --format "${{ inputs.format }}"
