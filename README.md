@@ -64,10 +64,7 @@ Add a GitHub Actions workflow to this repository at .github/workflows/aegis.yml 
 - Action: run studio2201/studio2201@v1 with tools: 'aegis' and fail-on: 'block'.
 - Artifacts: upload aegis_report.md using actions/upload-artifact@v4 with if: always().
 - Zero False Positives: @v1 provisions Aegis v0.2.10+ (skips comments & docstrings).
-- README Badge: add dynamic Shields.io workflow status badge to top of README.md (replace <owner>/<repo>):
-  [![aegis][b-aegis]][ci-aegis]
-  [b-aegis]: https://img.shields.io/github/actions/workflow/status/<owner>/<repo>/aegis.yml?label=aegis&logo=shield
-  [ci-aegis]: https://github.com/<owner>/<repo>/actions/workflows/aegis.yml
+- README Scorecard: embed the studio2201 Centered Scorecard table at top of README.md (specs: studio2201.com/agents).
 ```
 
 ### GitHub Actions Workflow
