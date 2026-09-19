@@ -92,7 +92,11 @@ pub fn scan_source(source: &Source) -> ScanReport {
         total_lines += 1;
         let line_num = idx + 1;
         let trimmed = line.trim();
-        if trimmed.starts_with("//") || trimmed.starts_with('#') || trimmed.starts_with("/*") {
+        if trimmed.starts_with("//")
+            || trimmed.starts_with('#')
+            || trimmed.starts_with("/*")
+            || trimmed.starts_with('*')
+        {
             continue;
         }
 
@@ -169,5 +173,45 @@ pub fn scan_source(source: &Source) -> ScanReport {
         evp_count,
         weak_hash_count,
         findings,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_comment_skipping() {
+        let code = r#"
+            // ECDSA in line comment
+            # ECDSA in python comment
+            /* ECDSA in block comment start */
+            /*
+             * ECDSA in block comment interior
+             * RSA_generate_key in block comment interior
+             */
+            let valid = 1;
+        "#;
+        let src = Source {
+            path: "test.c".into(),
+            content: code.into(),
+        };
+        let report = scan_source(&src);
+        assert_eq!(report.rsa_count, 0);
+        assert_eq!(report.ecc_count, 0);
+        assert_eq!(report.findings.len(), 0);
+    }
+
+    #[test]
+    fn test_detection_active_crypto() {
+        let code = "let key = ECDSA::generate();\nlet rsa = RSA_generate_key(2048);";
+        let src = Source {
+            path: "test.rs".into(),
+            content: code.into(),
+        };
+        let report = scan_source(&src);
+        assert_eq!(report.rsa_count, 1);
+        assert_eq!(report.ecc_count, 1);
+        assert_eq!(report.findings.len(), 2);
     }
 }
