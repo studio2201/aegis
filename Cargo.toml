@@ -1,6 +1,6 @@
 [package]
 name = "aegis"
-version = "0.2.6"
+version = "0.2.7"
 edition = "2021"
 publish = false
 description = "PQC migration SDK and OMB M-26-15 compliance scanner"

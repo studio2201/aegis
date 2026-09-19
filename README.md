@@ -1,17 +1,8 @@
 # Aegis
 
-[![CI](https://github.com/studio2201/aegis/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/studio2201/aegis/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/badge/version-v0.2.6-blue.svg)](https://github.com/studio2201/aegis/releases)
+[![studio2201 Suite](https://img.shields.io/badge/studio2201-5%2F5%20Verified-2f6f5e?logo=shield)](https://studio2201.com/agents#badges)
+[![Release](https://img.shields.io/badge/version-v0.2.7-blue.svg)](https://github.com/studio2201/aegis/releases)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![Pure std::](https://img.shields.io/badge/pure-std%3A%3A-success.svg)](https://studio2201.com)
-[![Reproducible](https://img.shields.io/badge/reproducible-OK-brightgreen.svg)](tools/dev/repro.sh)
-[![Max LOC](https://img.shields.io/badge/max%20LOC-%E2%89%A4256-brightgreen.svg)](https://studio2201.com)
-
-[![PQC Readiness](https://img.shields.io/badge/PQC-Quantum--Safe-blueviolet.svg)](https://studio2201.com/aegis)
-[![OMB M-26-15](https://img.shields.io/badge/OMB%20M--26--15-COMPLIANT-brightgreen.svg)](https://studio2201.com/aegis)
-[![NIST Standards](https://img.shields.io/badge/NIST-FIPS%20203%20%7C%20204-blue.svg)](https://studio2201.com/aegis)
-[![Algorithms](https://img.shields.io/badge/algorithms-ML--KEM--768%20%7C%20ML--DSA--65-blueviolet.svg)](https://studio2201.com/aegis)
-[![Classical Crypto](https://img.shields.io/badge/classical%20crypto-0%20legacy-brightgreen.svg)](https://studio2201.com/aegis)
 
 **PQC migration SDK & scanner.** Scans classical RSA/ECC cryptography, plans in OMB M-26-15 format, and emits ML-KEM-768 / ML-DSA-65 replacements.
 
