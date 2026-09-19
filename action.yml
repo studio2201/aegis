@@ -11,23 +11,54 @@ inputs:
     required: false
     default: '.'
   format:
-    description: 'Output format (text, json)'
+    description: 'Output format (markdown, text, json)'
     required: false
-    default: 'text'
+    default: 'markdown'
 
 runs:
   using: 'composite'
   steps:
-    - name: Set up Rust
-      uses: dtolnay/rust-toolchain@stable
-
-    - name: Build aegis
+    - name: Fast Bootstrap aegis
       shell: bash
       run: |
-        cargo build --release --manifest-path "${{ github.action_path }}/Cargo.toml"
-        echo "${{ github.action_path }}/target/release" >> $GITHUB_PATH
+        DEST="${XDG_BIN_HOME:-$HOME/.local/bin}"
+        mkdir -p "$DEST"
+        if ! command -v aegis >/dev/null 2>&1; then
+          if [ -f "${{ github.action_path }}/../install.sh" ]; then
+            sh "${{ github.action_path }}/../install.sh" --dest "$DEST" aegis
+          elif [ -f "${{ github.action_path }}/install.sh" ]; then
+            sh "${{ github.action_path }}/install.sh" --dest "$DEST" aegis
+          else
+            curl -fsSL --retry 3 https://studio2201.com/install.sh | sh -s -- --dest "$DEST" aegis
+          fi
+        fi
+        echo "$DEST" >> "$GITHUB_PATH"
 
     - name: Run Aegis Scan
       shell: bash
       run: |
-        aegis scan "${{ inputs.path }}" --format "${{ inputs.format }}"
+        export PATH="${XDG_BIN_HOME:-$HOME/.local/bin}:$PATH"
+        set +e
+        aegis scan "${{ inputs.path }}" --format "${{ inputs.format }}" > aegis_summary.md 2>&1
+        EC=$?
+        set -e
+
+        STATUS="🟢 COMPLIANT"
+        BADGE="https://img.shields.io/badge/Aegis-COMPLIANT-brightgreen"
+        if [ $EC -ne 0 ]; then
+          STATUS="🔴 ACTION REQUIRED"
+          BADGE="https://img.shields.io/badge/Aegis-NON--COMPLIANT-red"
+        fi
+
+        if [ -n "$GITHUB_STEP_SUMMARY" ]; then
+          {
+            echo "## 🛡️ Aegis Post-Quantum Cryptography Audit (OMB M-26-15)"
+            echo ""
+            echo "| Mandate Status | Statutory Deadline | Badge |"
+            echo "| :---: | :---: | :---: |"
+            echo "| **${STATUS}** | \`2030-12-31\` | ![Aegis](${BADGE}) |"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+          cat aegis_summary.md >> "$GITHUB_STEP_SUMMARY"
+        fi
+        exit $EC
