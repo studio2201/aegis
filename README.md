@@ -1,36 +1,11 @@
 # Aegis
 
-[![studio2201 Suite](https://img.shields.io/badge/studio2201-5%2F5%20Verified-2f6f5e?logo=shield)](https://studio2201.com/agents#badges)
+[![aegis][b-aegis]][ci-aegis]
 [![Release](https://img.shields.io/badge/version-v0.2.10-blue.svg)](https://github.com/studio2201/aegis/releases)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-<details>
-<summary>
-  <a href="https://studio2201.com/agents#badges">
-    <img src="https://img.shields.io/badge/studio2201-5%2F5%20Verified-2f6f5e?logo=shield" alt="studio2201 Suite">
-  </a> <b>Detailed Governance Scorecard</b>
-</summary>
-
-| Tool | Focus | Verdict | Status Badge |
-| :--- | :--- | :---: | :---: |
-| [**Snip**][u-snip] | Vibe-Code & Secrets Gate | `SHIP` | [![Vibe-Safe][b-snip]][u-snip] |
-| [**Vigil**][u-vigil] | Supply-Chain Dormancy | `HEALTHY` | [![Dormancy][b-vigil]][u-vigil] |
-| [**Aegis**][u-aegis] | PQC & Post-Quantum Scans | `QUANTUM-SAFE` | [![PQC][b-aegis]][u-aegis] |
-| [**Proven**][u-proven] | ML-DSA-65 Attestation | `VERIFIED` | [![SLSA][b-proven]][u-proven] |
-| [**Boneyard**][u-boneyard] | Tech-Debt Radar | `0/100 DEBT` | [![Boneyard][b-boneyard]][u-boneyard] |
-
-[u-snip]: https://studio2201.com/snip
-[u-vigil]: https://studio2201.com/vigil
-[u-aegis]: https://studio2201.com/aegis
-[u-proven]: https://studio2201.com/proven
-[u-boneyard]: https://studio2201.com/boneyard
-[b-snip]: https://img.shields.io/badge/vibe--safe-SHIP-brightgreen.svg
-[b-vigil]: https://img.shields.io/badge/dormancy-healthy-2f6f5e.svg
-[b-aegis]: https://img.shields.io/badge/PQC-Quantum--Safe-blueviolet.svg
-[b-proven]: https://img.shields.io/badge/SLSA-Level%203%2B-blue.svg
-[b-boneyard]: https://img.shields.io/badge/boneyard%20index-0%2F100-brightgreen.svg
-
-</details>
+[b-aegis]: https://img.shields.io/github/actions/workflow/status/studio2201/aegis/aegis.yml?label=aegis&logo=shield
+[ci-aegis]: https://github.com/studio2201/aegis/actions/workflows/aegis.yml
 
 **Post-quantum cryptography migration SDK.** Scans source trees for classical asymmetric cryptography
 (RSA, ECC), plans transition roadmaps in OMB M-26-15 format, and emits drop-in NIST PQC replacement shims.
@@ -59,58 +34,45 @@ Deploy Aegis into your CI pipeline using your AI coding assistant or directly ad
 Copy and paste this prompt to Cursor, Claude Code, Copilot Workspace, or Devin:
 
 ```text
-Add a GitHub Actions workflow to this repository at .github/workflows/studio2201.yml using studio2201/studio2201@master.
-Trigger on pull_request and push to master/main, and workflow_dispatch.
-Configure concurrency with cancel-in-progress on pull requests.
-Set permissions to contents: read, checkout with fetch-depth: 0, run studio2201/studio2201@master with tools: 'all' and fail-on: 'block'.
-Retain audit findings using actions/upload-artifact@v4 with if: always().
-Finally, add the Option 1 Single Suite Badge or Option 2 Governance Scorecard to README.md.
+Add a GitHub Actions workflow to this repository at .github/workflows/aegis.yml using studio2201/studio2201@v1:
+- Name: aegis
+- Triggers: pull_request, push to default branch (master/main), and workflow_dispatch.
+- Concurrency: group ${{ github.workflow }}-${{ github.ref }} with cancel-in-progress on pull_request.
+- Permissions: contents: read, checkout with fetch-depth: 0.
+- Action: run studio2201/studio2201@v1 with tools: 'aegis' and fail-on: 'block'.
+- Artifacts: upload aegis_report.md using actions/upload-artifact@v4 with if: always().
+- Zero False Positives: @v1 provisions Aegis v0.2.10+ (skips comments & docstrings).
+- README Badge: add dynamic Shields.io workflow status badge to top of README.md (replace <owner>/<repo>):
+  [![aegis][b-aegis]][ci-aegis]
+  [b-aegis]: https://img.shields.io/github/actions/workflow/status/<owner>/<repo>/aegis.yml?label=aegis&logo=shield
+  [ci-aegis]: https://github.com/<owner>/<repo>/actions/workflows/aegis.yml
 ```
 
 ### GitHub Actions Workflow
 
-Commit this complete, production-ready workflow at `.github/workflows/studio2201.yml`:
+Commit this complete, production-ready workflow at `.github/workflows/aegis.yml`:
 
 ```yaml
-name: studio2201 Security Gate
+name: aegis
 on:
-  push:
-    branches: [ master, main ]
-  pull_request:
-    branches: [ master, main ]
+  push: { branches: [ master, main ] }
+  pull_request: { branches: [ master, main ] }
   workflow_dispatch:
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
-
-permissions:
-  contents: read
-
+permissions: { contents: read }
 jobs:
-  security-gate:
-    name: studio2201 Security Gate
+  aegis:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Run studio2201 Security Gate
-        uses: studio2201/studio2201@master
-        with:
-          tools: 'all'
-          fail-on: 'block'
-
-      - name: Retain Audit Findings
-        uses: actions/upload-artifact@v4
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: studio2201/studio2201@v1
+        with: { tools: 'aegis', fail-on: 'block' }
+      - uses: actions/upload-artifact@v4
         if: always()
-        with:
-          name: studio2201-audit-findings
-          path: |
-            *_report.md
-          if-no-files-found: ignore
+        with: { name: aegis-report, path: aegis_report.md, if-no-files-found: ignore }
 ```
 
 ## How It Works Under the Hood
