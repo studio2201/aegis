@@ -56,15 +56,13 @@ Deploy Aegis into your CI pipeline using your AI coding assistant or directly ad
 Copy and paste this prompt to Cursor, Claude Code, Copilot Workspace, or Devin:
 
 ```text
-Add a GitHub Actions workflow to this repository at .github/workflows/aegis.yml using studio2201/studio2201@v1:
+Add a GitHub Actions workflow to this repository at .github/workflows/aegis.yml using studio2201/aegis@v1:
 - Name: aegis
 - Triggers: pull_request, push to default branch (master/main), and workflow_dispatch.
 - Concurrency: group ${{ github.workflow }}-${{ github.ref }} with cancel-in-progress on pull_request.
 - Permissions: contents: read, checkout with fetch-depth: 0.
-- Action: run studio2201/studio2201@v1 with tools: 'aegis' and fail-on: 'block'.
-- Artifacts: upload aegis_report.md using actions/upload-artifact@v4 with if: always().
-- Zero False Positives: @v1 provisions Aegis v0.2.10+ (skips comments & docstrings).
-- README Scorecard: embed the studio2201 Centered Scorecard table at top of README.md (specs: studio2201.com/agents).
+- Action: run studio2201/aegis@v1.
+- Artifacts: upload aegis_summary.md using actions/upload-artifact@v4 with if: always().
 ```
 
 ### GitHub Actions Workflow
@@ -87,11 +85,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
-      - uses: studio2201/studio2201@v1
-        with: { tools: 'aegis', fail-on: 'block' }
+      - uses: studio2201/aegis@v1
       - uses: actions/upload-artifact@v4
         if: always()
-        with: { name: aegis-report, path: aegis_report.md, if-no-files-found: ignore }
+        with: { name: aegis-report, path: aegis_summary.md, if-no-files-found: ignore }
 ```
 
 ## How It Works Under the Hood
