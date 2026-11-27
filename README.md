@@ -108,8 +108,8 @@ jobs:
 ## Quick Start
 
 ```bash
-# Install via studio2201 installer
-curl -fsSL https://studio2201.com/install.sh | sh -s aegis
+# Install from source (or download release tarballs from GitHub Releases)
+cargo install --git https://github.com/studio2201/aegis
 
 # Scan source code for classical cryptography
 aegis scan .

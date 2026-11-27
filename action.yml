@@ -18,28 +18,45 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Fast Bootstrap aegis
+    - name: Bootstrap aegis (pinned v0.2.10 + SHA-256)
       shell: bash
       run: |
         DEST="${XDG_BIN_HOME:-$HOME/.local/bin}"
         mkdir -p "$DEST"
         if ! command -v aegis >/dev/null 2>&1; then
-          if [ -f "${{ github.action_path }}/../install.sh" ]; then
-            sh "${{ github.action_path }}/../install.sh" --dest "$DEST" aegis
-          elif [ -f "${{ github.action_path }}/install.sh" ]; then
-            sh "${{ github.action_path }}/install.sh" --dest "$DEST" aegis
+          TMP=$(mktemp -d)
+          trap 'rm -rf "$TMP"' EXIT
+          case "$(uname -s)-$(uname -m)" in
+            Linux-x86_64) TARGET="x86_64-unknown-linux-musl" ;;
+            Linux-aarch64|Linux-arm64) TARGET="aarch64-unknown-linux-musl" ;;
+            Darwin-x86_64) TARGET="x86_64-apple-darwin" ;;
+            Darwin-arm64|Darwin-aarch64) TARGET="aarch64-apple-darwin" ;;
+            *) echo "::error::Unsupported platform $(uname -s)-$(uname -m)"; exit 1 ;;
+          esac
+          ASSET="aegis-${TARGET}.tar.gz"
+          URL="https://github.com/studio2201/aegis/releases/download/v0.2.10/${ASSET}"
+          curl -fsSL --retry 3 "$URL" -o "$TMP/$ASSET"
+          curl -fsSL --retry 3 "${URL}.sha256" -o "$TMP/${ASSET}.sha256"
+          EXPECTED=$(awk '{print $1}' "$TMP/${ASSET}.sha256")
+          [[ "$EXPECTED" =~ ^[0-9a-fA-F]{64}$ ]] || { echo "::error::Invalid SHA-256 for $ASSET"; exit 1; }
+          if command -v sha256sum >/dev/null 2>&1; then
+            (cd "$TMP" && printf '%s  %s\n' "$EXPECTED" "$ASSET" | sha256sum --strict --check -)
           else
-            curl -fsSL --retry 3 https://studio2201.com/install.sh | sh -s -- --dest "$DEST" aegis
+            (cd "$TMP" && printf '%s  %s\n' "$EXPECTED" "$ASSET" | shasum -a 256 --check -)
           fi
+          tar -xzf "$TMP/$ASSET" -C "$DEST" aegis && chmod 755 "$DEST/aegis"
         fi
         echo "$DEST" >> "$GITHUB_PATH"
 
     - name: Run Aegis Scan
       shell: bash
+      env:
+        INPUT_PATH: ${{ inputs.path }}
+        INPUT_FORMAT: ${{ inputs.format }}
       run: |
         export PATH="${XDG_BIN_HOME:-$HOME/.local/bin}:$PATH"
         set +e
-        aegis scan "${{ inputs.path }}" --format "${{ inputs.format }}" > aegis_summary.md 2>&1
+        aegis scan "$INPUT_PATH" --format "$INPUT_FORMAT" > aegis_summary.md 2>&1
         EC=$?
         set -e
 
@@ -50,7 +67,7 @@ runs:
           BADGE="https://img.shields.io/badge/Aegis-NON--COMPLIANT-red"
         fi
 
-        if [ -n "$GITHUB_STEP_SUMMARY" ]; then
+        if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
           {
             echo "## 🛡️ Aegis Post-Quantum Cryptography Audit (OMB M-26-15)"
             echo ""
